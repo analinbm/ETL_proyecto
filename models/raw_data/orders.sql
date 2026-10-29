@@ -9,7 +9,7 @@
 -- dbt build 
 
 
--- pq a cada compilacio la taula es reinicii
+-- vull q es faci nova columna on es posi si s'ha fet update o no
 
 
 {{
