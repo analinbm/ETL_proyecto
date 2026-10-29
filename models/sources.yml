@@ -1,5 +1,5 @@
 version: 2
-#identifier indica com està inscrit a la taula
+#identifier indica com està cada columna inscrita a la taula de snowflake
 sources:
   - name: EDIT_SAMPLE_DATA
     description: "raw database"
