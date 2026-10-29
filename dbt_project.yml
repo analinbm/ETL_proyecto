@@ -42,3 +42,8 @@ models:
       +materialized: table
     raw_data:
       +materialized: table
+    TransformationLayer: 
+      +materialized: view
+    adapter_properties:
+      +materialized: table
+
