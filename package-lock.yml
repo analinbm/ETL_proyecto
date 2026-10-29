@@ -1,0 +1,14 @@
+packages:
+  - name: dbt_utils
+    package: dbt-labs/dbt_utils
+    version: 1.4.1
+  - name: codegen
+    package: dbt-labs/codegen
+    version: 0.14.1
+  - name: dbt_snowflake_monitoring
+    package: get-select/dbt_snowflake_monitoring
+    version: 5.6.1
+  - name: dbt_query_tags
+    package: get-select/dbt_query_tags
+    version: 3.2.0
+sha1_hash: b16e5950976925cd3e12b73a836e03aa28115d64
