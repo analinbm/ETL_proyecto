@@ -2,20 +2,91 @@
 version: 2
 
 models:
-    - name: my_first_dbt_model
-      description: "A starter dbt model"
+    - name: customers
+      description: "customers"
       columns:
-          - name: id
+          - name: C_CUSTKEY
             description: "The primary key for this table"
             tests:
                 - unique
                 - not_null
+                - not_empty_string
 
-    - name: my_second_dbt_model
+    - name: LINEITEM
       description: "A starter dbt model"
       columns:
-          - name: id
+          - name: L_ORDERKEY
             description: "The primary key for this table"
             tests:
                 - unique
                 - not_null
+                - not_empty_string
+
+
+    - name: NATION
+      description: "A starter dbt model"
+      columns:
+          - name: N_NATIONKEY
+            description: "The primary key for this table"
+            tests:
+                - unique
+                - not_null
+                - not_empty_string
+
+    - name: orders
+      description: "customers"
+      columns:
+          - name: O_ORDERKEY
+            description: "The primary key for this table"
+            tests:
+                - unique
+                - not_null
+                - not_empty_string
+
+    - name: part
+      description: "A starter dbt model"
+      columns:
+          - name: P_PARTKEY
+            description: "The primary key for this table"
+            tests:
+                - unique
+                - not_null
+                - not_empty_string
+
+
+    - name: partsupp
+      description: "A starter dbt model"
+      columns:
+          - name: PS_PARTKEY
+            description: "The primary key for this table"
+            tests:
+                - unique
+                - not_null
+                - not_empty_string
+
+
+    - name: supplier
+      description: "A starter dbt model"
+      columns:
+          - name: S_SUPPKEY
+            description: "The primary key for this table"
+            tests:
+                - unique
+                - not_null
+                - not_empty_string
+
+
+    - name: region
+      description: "A starter dbt model"
+      columns:
+          - name: R_REGIONKEY
+            description: "The primary key for this table"
+            tests:
+                - unique
+                - not_null
+                - not_empty_string
+
+
+
+
+          
