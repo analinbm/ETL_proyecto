@@ -10,7 +10,7 @@ models:
             tests:
                 - unique
                 - not_null
-                - not_empty_string
+                - dbt_utils.not_empty_string
 
     - name: LINEITEM
       description: "A starter dbt model"
@@ -20,7 +20,7 @@ models:
             tests:
                 - unique
                 - not_null
-                - not_empty_string
+                - dbt_utils.not_empty_string
 
 
     - name: NATION
@@ -31,7 +31,7 @@ models:
             tests:
                 - unique
                 - not_null
-                - not_empty_string
+                - dbt_utils.not_empty_string
 
     - name: orders
       description: "customers"
@@ -41,7 +41,7 @@ models:
             tests:
                 - unique
                 - not_null
-                - not_empty_string
+                - dbt_utils.not_empty_string
 
     - name: part
       description: "A starter dbt model"
@@ -51,7 +51,7 @@ models:
             tests:
                 - unique
                 - not_null
-                - not_empty_string
+                - dbt_utils.not_empty_string
 
 
     - name: partsupp
@@ -62,7 +62,7 @@ models:
             tests:
                 - unique
                 - not_null
-                - not_empty_string
+                - dbt_utils.not_empty_string
 
 
     - name: supplier
@@ -73,7 +73,7 @@ models:
             tests:
                 - unique
                 - not_null
-                - not_empty_string
+                - dbt_utils.not_empty_string
 
 
     - name: region
@@ -84,7 +84,7 @@ models:
             tests:
                 - unique
                 - not_null
-                - not_empty_string
+                - dbt_utils.not_empty_string
 
 
 
