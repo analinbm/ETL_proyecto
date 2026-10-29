@@ -1,7 +1,10 @@
 
 -- escullo aqsta taula x incremental: pq a la taula, es poden anar editant els estatus de les orders, es de tipus table
+--dbt build --select orders --full-refresh --per reiniciar taula i tornar a les dades  inicials
+-- dbt build --select orders 
 
--- dbt build --select orders --full-refresh
+--resultats guardats a ANALYTICS.DBT_ANALINBM.ORDERS x snowflake
+
 
 -- dbt build 
 
@@ -19,15 +22,13 @@ select O_ORDERKEY,O_CUSTKEY,O_ORDERSTATUS,O_TOTALPRICE,O_ORDERDATE,O_ORDERPRIORI
 
 
 {% if is_incremental()%}
-   case
-    when O_ORDERSTATUS='O' then 'UPDATED' 
-    when O_ORDERSTATUS='P' then 'UPDATED' 
-    else 'NOT UPDATED' 
-    end
+    'UPDATED'
 {%else%}
     'NOT UPDATED'
 {%endif%}
+
 as O_ORD_STAT_UPDATE
+
 from {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }}
 
 
