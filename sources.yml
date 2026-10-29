@@ -6,12 +6,12 @@ sources:
       database: EDIT_SAMPLE_DATA
       schema: raw_TPCH_SF1
       tables:
-        - name: raw_CUSTOMER
-        - name: raw_LINEITEM
-        - name: raw_NATION
-        - name: raw_ORDERS
-        - name: raw_PART
-        - name: raw_PARTSUPP
-        - name: raw_REGION
-        - name: raw_SUPPLIER
+        - name: CUSTOMERS
+        - name: LINEITEM
+        - name: NATION
+        - name: ORDERS
+        - name: PART
+        - name: PARTSUPP
+        - name: REGION
+        - name: SUPPLIER
      
