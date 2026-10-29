@@ -1,2 +1,2 @@
 select *
-from {{ source('EDIT_SAMPLE_DATA', 'customers') }}
+from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }}
