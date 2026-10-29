@@ -19,16 +19,12 @@
 
 
 select O_ORDERKEY,O_CUSTKEY,O_ORDERSTATUS,O_TOTALPRICE,O_ORDERDATE,O_ORDERPRIORITY,O_CLERK,O_SHIPPRIORITY,O_COMMENT,
-
-
 {% if is_incremental()%}
     'UPDATED'
 {%else%}
     'NOT UPDATED'
 {%endif%}
-
 as O_ORD_STAT_UPDATE
-
 from {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }}
 
 
