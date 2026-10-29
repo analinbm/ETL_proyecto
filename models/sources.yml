@@ -1,0 +1,25 @@
+version: 2
+#identifier indica com està inscrit a la taula
+sources:
+    - name: EDIT_SAMPLE_DATA
+      description: "raw database"
+      database: EDIT_SAMPLE_DATA
+      schema: raw_TPCH_SF1
+      tables:
+        - name: CUSTOMERS
+          identifier: RAW_CUSTOMER
+        - name: LINEITEM
+          identifier: RAW_LINEITEM   
+        - name: NATION
+          identifier: RAW_NATION
+        - name: ORDERS
+          identifier: RAW_ORDERS
+        - name: PART
+          identifier: RAW_PART
+        - name: PARTSUPP
+          identifier: RAW_PARTSUPP
+        - name: REGION
+          identifier: RAW_REGION
+        - name: SUPPLIER
+          identifier: RAW_SUPPLIER
+     
