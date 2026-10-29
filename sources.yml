@@ -3,6 +3,7 @@ version: 2
 sources:
     - name: EDIT_SAMPLE_DATA
       description: "raw database"
+      database: EDIT_SAMPLE_DATA
       schema: raw_TPCH_SF1
       tables:
         - name: raw_CUSTOMER
