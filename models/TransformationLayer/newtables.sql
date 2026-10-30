@@ -10,6 +10,17 @@ select O.O_ORDERSTATUS, count(*) as number
 from {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O
 group by O.O_ORDERSTATUS
 
+--VULL SABER REGIO, NACIO I COM S ORDENEN, NO IMPORTA Q ESTIGUIN EMPATATS 
+select R.R_NAME, N.N_NAME,
+DENSE_RANK() over (partition by R.R_NAME ORDER BY count(DISTINCT C.C_CUSTKEY)) as rank_num_customers,
+DENSE_RANK() over (partition by R.R_NAME ORDER BY count(O.O_ORDERKEY) desc) as rank_num_orders,
+DENSE_RANK() over (partition by R.R_NAME order by SUM(O.O_TOTALPRICE) desc) as rank_TOTALPRICE
+
+FROM {{ source('EDIT_SAMPLE_DATA', 'REGION') }} R
+left join {{ source('EDIT_SAMPLE_DATA', 'NATION') }} N on N.N_REGIONKEY=R.R_REGIONKEY
+left join {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C ON C.C_NATIONKEY=N.N_NATIONKEY
+left join {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O on O.O_CUSTKEY=C.C_CUSTKEY
+group by R.R_NAME, N.N_NAME
 
 
 
@@ -22,20 +33,21 @@ group by C.C_CUSTKEY
 
 
 
-{% set C_MKTSEGMENT_list=[HOUSEHOLD,BUILDING, AUTOMOBILE, FURNITURE,MACHINERY] %}
-    WITH market_seg as (select C.C_MKTSEGMENT 
-    {% for mkt_s in C_MKTSEGMENT_list %}
-        sum()
-    {% endfor %}
-    
-    
-    from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C)
-{% endmacro %}
+--vull separar per market segments i posar en cadascun, price total orders i total orders
+select C.C_MKTSEGMENT, count(O.O_ORDERKEY) as number_orders,
+sum(O.O_TOTALPRICE) as orders_total_price_per_mkt
+from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C
+left join {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O on O.O_CUSTKEY=C.C_CUSTKEY
+group by C.C_MKTSEGMENT
 
 
 
 
-
+select C.C_MKTSEGMENT, count(O.O_ORDERKEY) over (partition by C.C_MKTSEGMENT) as number_orders,
+sum(O.O_TOTALPRICE) over (partition by C.C_MKTSEGMENT) as orders_total_price_per_mkt
+from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C
+left join {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O on O.O_CUSTKEY=C.C_CUSTKEY
+group by C.C_MKTSEGMENT
 
 
 
@@ -174,25 +186,3 @@ group by PS_PARTKEY
 
 
 
-{%- set payment_methods = ["bank_transfer", "credit_card", "coupon", "gift_card"] -%}
-
-with 
-    payments as (
-        select * from {{ ref("stg_stripe__payment") }}
-        ),
-    
-    final as (
-        select
-            order_id,
-            {% for payment_method in payment_methods -%}
-                sum(
-                    case
-                        when payment_method = '{{ payment_method }}' then payment_amount else 0
-                    end
-                ) as {{ payment_method }}_amount
-                {%- if not loop.last -%}, {% endif -%}
-            {%- endfor %}
-        from payments
-        group by 1
-    )
-select * from final
