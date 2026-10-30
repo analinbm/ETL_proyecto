@@ -11,6 +11,38 @@ from {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O
 group by O.O_ORDERSTATUS
 
 
+
+
+
+
+---PER SABER QUANTS HI HA TIPU_mkt
+select C.C_CUSTKEY, count(*) as number
+from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C
+group by C.C_CUSTKEY
+
+
+
+{% set C_MKTSEGMENT_list=[HOUSEHOLD,BUILDING, AUTOMOBILE, FURNITURE,MACHINERY] %}
+    WITH market_seg as (select C.C_MKTSEGMENT 
+    {% for mkt_s in C_MKTSEGMENT_list %}
+        sum()
+    {% endfor %}
+    
+    
+    from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C)
+{% endmacro %}
+
+
+
+
+
+
+
+
+
+
+
+--client nom, regio, nacio
 select C_NAME,R.R_NAME,N.N_NAME
 from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C
 left join {{ source('EDIT_SAMPLE_DATA', 'NATION') }} N on N.N_NATIONKEY=C.C_NATIONKEY
@@ -25,7 +57,48 @@ select O.O_ORDERSTATUS, count(*) as number_orders
 from {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O
 group by O.O_ORDERSTATUS
 
---R_NAME i el NUM_ORDERS, el NUM_CLIENTS, TOTAL_PRICE orders
+
+--RETURN FLAG I NUM_COMANDES
+--quantitat dE NUM_COMANDES X RETURN FLAG
+select L.L_RETURNFLAG, count(*) as number_item 
+from {{ source('EDIT_SAMPLE_DATA', 'LINEITEM') }} L
+group by L.L_RETURNFLAG
+--having count(O.O_ORDERKEY)>1
+
+
+--part(pieza vendida),subministrament preu, preu retail: parella peça-proveïdor
+--si la pieza esta molt demanada (high, regular low), per comparar proveidors
+select PS.PS_PARTKEY, PS.PS_SUPPKEY, PS.PS_SUPPLYCOST, P.P_RETAILPRICE, (P.P_RETAILPRICE-PS.PS_SUPPLYCOST) as Unitary_Margin, 
+case
+    when count(L.L_PARTKEY)>5 then 'HIGH'
+    when count(L.L_PARTKEY) between 1 and 5 then 'REGULAR'
+    else 'LOW'
+end
+as Type_demmand
+from {{ source('EDIT_SAMPLE_DATA', 'PARTSUPP') }} PS
+left join {{ source('EDIT_SAMPLE_DATA', 'PART') }} P on P.P_PARTKEY=PS.PS_PARTKEY
+left join {{ source('EDIT_SAMPLE_DATA', 'LINEITEM') }} L on L.L_SUPPKEY=PS.PS_SUPPKEY and L.L_PARTKEY=PS.PS_PARTKEY and L.L_RETURNFLAG<>'R'
+group by PS.PS_PARTKEY, PS.PS_SUPPKEY, PS.PS_SUPPLYCOST, P.P_RETAILPRICE
+
+
+
+--quantitat d'ordres per costumer I SABER SI ALGUN CLIENT HA FET MES DE1 
+--quantitat de orders x cada status-- commands
+select C.C_NAME, count(*) as number_orders
+from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C 
+left join {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O on O.O_CUSTKEY =C.C_CUSTKEY
+group by C.C_NAME
+--having count(O.O_ORDERKEY)>1
+
+
+
+select L.L_SHIPMODE, count(distinct(O.O_ORDERKEY)) as number_orders
+FROM {{ source('EDIT_SAMPLE_DATA', 'LINEITEM') }} L
+left join {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O ON O.O_ORDERKEY=L.L_ORDERKEY
+group by L.L_SHIPMODE
+
+
+--regio nom i el NUM_ORDERS, el NUM_CLIENTS, TOTAL_PRICE orders
 select R.R_NAME,count(O_ORDERKEY) as num_orders, count(distinct C.C_CUSTKEY) as num_clients, sum(O.O_TOTALPRICE) as Total_price
 from {{ source('EDIT_SAMPLE_DATA', 'REGION') }} R
 left join {{ source('EDIT_SAMPLE_DATA', 'NATION') }} N on N.N_REGIONKEY=R.R_REGIONKEY
@@ -35,7 +108,7 @@ group by R.R_NAME
 
 
 
-
+------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 --Faig una CTE per posar a cada nacio, els orders q hi ha per el tipus de priority
@@ -51,3 +124,75 @@ select type_priority, sum(number_orders_type) as number_total_orders_of_specific
 from orders_priority_nation
 group by type_priority
 order by type_priority
+
+--, L.L_QUANTITY,L_DISCOUNT,L_TAX
+
+--Faig una CTE per saber pieza i cost PER A L'EMPRESA (dona iguual proveidor), DINERS FACTURATS, 
+--select PS.PS_PARTKEY, PS.PS_SUPPKEY, PS.PS_SUPPLYCOST, P.P_RETAILPRICE,
+
+
+with sales_of_parts as (select PS.PS_PARTKEY, PS.PS_SUPPKEY,(L.L_QUANTITY*PS.PS_SUPPLYCOST) AS COGS,L.L_EXTENDEDPRICE as revenue_part,
+L.L_EXTENDEDPRICE*(1-L.L_DISCOUNT)	as	sale_price_part
+from {{ source('EDIT_SAMPLE_DATA', 'PARTSUPP') }} PS 
+
+left join {{ source('EDIT_SAMPLE_DATA', 'LINEITEM') }} L ON L.L_SUPPKEY=PS.PS_SUPPKEY and L.L_PARTKEY=PS.PS_PARTKEY and L.L_RETURNFLAG<>'R'
+
+)
+
+--SELECT * FROM sales_of_parts
+
+-- VULL MOSTRAR GROSS PROFIT I GROSS MARGIN
+select PS_PARTKEY, coalesce(sum(COGS),0) as COGS_parts,coalesce(sum(revenue_part),0) as revenue,coalesce(sum(sale_price_part),0) as net_revenue, coalesce(sum(sale_price_part),0)-coalesce(sum(COGS),0) as GROSS_PROFIT,
+case coalesce(sum(sale_price_part),0)
+    when 0 then 0
+    else round((coalesce(sum(sale_price_part),0)-coalesce(sum(COGS),0))*100/coalesce(sum(sale_price_part),0),2)
+end as GROSS_MARGIN_percentage
+from sales_of_parts
+group by PS_PARTKEY
+
+--coalesce: PQ NO SIGUI NULL I SIGUI ZERO
+--peces no venudes: surt 0
+--TOTAL_SALE_PRICE_PART=net_revenue(descompte inclos)
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+--mcros
+
+--vull calcular-ho en un mes
+--2400002,188783,3820,1,14.00,26204.92,0.09,0.01,R,F,1994-09-13,1994-09-25,1994-10-06,TAKE BACK RETURN,MAIL," around the slyly ironi"
+{{re_stock_inventory(2400002,'1994-09-13')}}
+{{delivery_delays()}}
+
+
+
+
+
+
+
+
+
+{%- set payment_methods = ["bank_transfer", "credit_card", "coupon", "gift_card"] -%}
+
+with 
+    payments as (
+        select * from {{ ref("stg_stripe__payment") }}
+        ),
+    
+    final as (
+        select
+            order_id,
+            {% for payment_method in payment_methods -%}
+                sum(
+                    case
+                        when payment_method = '{{ payment_method }}' then payment_amount else 0
+                    end
+                ) as {{ payment_method }}_amount
+                {%- if not loop.last -%}, {% endif -%}
+            {%- endfor %}
+        from payments
+        group by 1
+    )
+select * from final
