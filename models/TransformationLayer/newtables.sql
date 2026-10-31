@@ -12,7 +12,7 @@ group by O.O_ORDERSTATUS
 
 --VULL SABER REGIO, NACIO I COM S ORDENEN, NO IMPORTA Q ESTIGUIN EMPATATS 
 select R.R_NAME, N.N_NAME,
-DENSE_RANK() over (partition by R.R_NAME ORDER BY count(DISTINCT C.C_CUSTKEY)) as rank_num_customers,
+DENSE_RANK() over (partition by R.R_NAME ORDER BY count(DISTINCT C.C_CUSTKEY) desc) as rank_num_customers,
 DENSE_RANK() over (partition by R.R_NAME ORDER BY count(O.O_ORDERKEY) desc) as rank_num_orders,
 DENSE_RANK() over (partition by R.R_NAME order by SUM(O.O_TOTALPRICE) desc) as rank_TOTALPRICE
 
@@ -27,9 +27,9 @@ group by R.R_NAME, N.N_NAME
 
 
 ---PER SABER QUANTS HI HA TIPU_mkt
-select C.C_CUSTKEY, count(*) as number
+select C.C_MKTSEGMENT, count(*) as number
 from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C
-group by C.C_CUSTKEY
+group by C.C_MKTSEGMENT
 
 
 
@@ -42,26 +42,16 @@ group by C.C_MKTSEGMENT
 
 
 
-
-select C.C_MKTSEGMENT, count(O.O_ORDERKEY) over (partition by C.C_MKTSEGMENT) as number_orders,
-sum(O.O_TOTALPRICE) over (partition by C.C_MKTSEGMENT) as orders_total_price_per_mkt
-from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C
-left join {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O on O.O_CUSTKEY=C.C_CUSTKEY
-group by C.C_MKTSEGMENT
-
-
-
-
-
+--distict: pq no es repeteixi 
 
 --client nom, regio, nacio
-select C_NAME,R.R_NAME,N.N_NAME
+select distinct C.C_NAME,R.R_NAME,N.N_NAME
 from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C
 left join {{ source('EDIT_SAMPLE_DATA', 'NATION') }} N on N.N_NATIONKEY=C.C_NATIONKEY
 left join {{ source('EDIT_SAMPLE_DATA', 'REGION') }} R on R.R_REGIONKEY  = N.N_REGIONKEY
 left join {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O on C.C_CUSTKEY=O.O_CUSTKEY 
 where O.O_ORDERSTATUS<>'F'
-order by R_NAME, N_NAME
+order by R.R_NAME, N.N_NAME
 
 
 --quantitat de orders x cada status
@@ -86,7 +76,7 @@ case
     when count(L.L_PARTKEY) between 1 and 5 then 'REGULAR'
     else 'LOW'
 end
-as Type_demmand
+as Type_demand
 from {{ source('EDIT_SAMPLE_DATA', 'PARTSUPP') }} PS
 left join {{ source('EDIT_SAMPLE_DATA', 'PART') }} P on P.P_PARTKEY=PS.PS_PARTKEY
 left join {{ source('EDIT_SAMPLE_DATA', 'LINEITEM') }} L on L.L_SUPPKEY=PS.PS_SUPPKEY and L.L_PARTKEY=PS.PS_PARTKEY and L.L_RETURNFLAG<>'R'
@@ -96,7 +86,7 @@ group by PS.PS_PARTKEY, PS.PS_SUPPKEY, PS.PS_SUPPLYCOST, P.P_RETAILPRICE
 
 --quantitat d'ordres per costumer I SABER SI ALGUN CLIENT HA FET MES DE1 
 --quantitat de orders x cada status-- commands
-select C.C_NAME, count(*) as number_orders
+select C.C_NAME, count(O.O_ORDERKEY) as number_orders
 from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C 
 left join {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O on O.O_CUSTKEY =C.C_CUSTKEY
 group by C.C_NAME
@@ -118,7 +108,10 @@ left join {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C on  C.C_NATIONKEY = N.
 left join {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O on O.O_CUSTKEY=C.C_CUSTKEY
 group by R.R_NAME
 
-
+-----------------------------------------------------------------------------------------------------
+select O.O_ORDERKEY, count(L.L_ORDERKEY) as num_line_items from {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O
+left join {{ source('EDIT_SAMPLE_DATA', 'LINEITEM') }} L on L.L_ORDERKEY=O.O_ORDERKEY
+group by O.O_ORDERKEY
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -168,21 +161,9 @@ group by PS_PARTKEY
 
 ------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-
 --mcros
 
 --vull calcular-ho en un mes
 --2400002,188783,3820,1,14.00,26204.92,0.09,0.01,R,F,1994-09-13,1994-09-25,1994-10-06,TAKE BACK RETURN,MAIL," around the slyly ironi"
-{{re_stock_inventory(2400002,'1994-09-13')}}
+{{re_stock_inventory(188783,'1994-09-13')}}
 {{delivery_delays()}}
-
-
-
-
-
-
-
-
-
