@@ -11,6 +11,7 @@ models:
           - not_null
           - dbt_utils.not_empty_string
 
+
   - name: LINEITEM
     description: "A starter dbt model"
     columns:
@@ -50,6 +51,7 @@ models:
           - unique
           - not_null
           - dbt_utils.not_empty_string
+
 
   - name: partsupp
     description: "A starter dbt model"
