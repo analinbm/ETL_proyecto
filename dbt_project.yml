@@ -46,4 +46,7 @@ models:
       +materialized: view
     adapter_properties:
       +materialized: table
+    businesslayer:
+      +materialized: table
+
 
