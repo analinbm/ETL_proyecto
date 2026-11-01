@@ -1,3 +1,6 @@
+{%docs star_schema%}
+
+
 --fact_table
 --order_dim   ----NO FER CAS
 --TIME_DIM
@@ -62,3 +65,8 @@ left join {{ source('EDIT_SAMPLE_DATA', 'PART') }} P ON P.P_PARTKEY=sales_of_par
 left join {{ source('EDIT_SAMPLE_DATA', 'SUPPLIER') }} S ON S.S_SUPPKEY=sales_of_parts.PS_SUPPKEY
 
 GROUP BY O.O_ORDERKEY,P.P_PARTKEY,C.C_CUSTKEY,S.S_SUPPKEY,O.O_ORDERDATE,sales_of_parts.L_SHIPDATE,sales_of_parts.L_COMMITDATE,sales_of_parts.L_RECEIPTDATE, P.P_RETAILPRICE
+
+
+
+
+{%enddocs%}
