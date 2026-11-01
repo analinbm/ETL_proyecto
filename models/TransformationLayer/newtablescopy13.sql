@@ -1,5 +1,5 @@
 --VULL SABER REGIO, NACIO I COM S ORDENEN, NO IMPORTA Q ESTIGUIN EMPATATS 
-select R.R_NAME, N.N_NAME,
+select  N.N_NAME,R.R_NAME,
 DENSE_RANK() over (partition by R.R_NAME ORDER BY count(DISTINCT C.C_CUSTKEY) desc) as rank_num_customers,
 DENSE_RANK() over (partition by R.R_NAME ORDER BY count(O.O_ORDERKEY) desc) as rank_num_orders,
 DENSE_RANK() over (partition by R.R_NAME order by SUM(O.O_TOTALPRICE) desc) as rank_TOTALPRICE
