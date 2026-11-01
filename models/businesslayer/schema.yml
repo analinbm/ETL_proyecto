@@ -1,0 +1,88 @@
+version: 2
+
+models:
+  - name: fact_table
+    description: "Fact table lineitem"
+    columns:
+      - name: P_PARTKEY
+        tests:
+          - relationships: 
+              to: ref('part_dim')
+              field: P_PARTKEY
+
+      - name: C_CUSTKEY
+        tests:
+          - relationships: 
+              to: ref('customer_dim')
+              field: C_CUSTKEY
+
+      - name: C_NATIONKEY
+        tests:
+          - relationships: 
+              to: ref('region_dim')
+              field: N_NATIONKEY
+
+      - name: O_ORDERDATE
+        tests:
+          - relationships: 
+              to: ref('time_dim')
+              field: SPECIFIC_DATE
+
+      - name: S_SUPPKEY
+        tests:
+          - relationships: 
+              to: ref('supplier_dim')
+              field: S_SUPPKEY 
+              
+
+  - name: part_dim
+    description: "Product dimension"
+    columns:
+      - name: P_PARTKEY
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+          - dbt_utils.not_empty_string
+
+  - name: customer_dim
+    description: "client"
+    columns:
+      - name: C_CUSTKEY
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+          - dbt_utils.not_empty_string
+
+  - name: region_dim
+    description: "Location"
+    columns:
+      - name: N_NATIONKEY
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+          - dbt_utils.not_empty_string
+
+  - name: time_dim
+    description: "Date"
+    columns: 
+      - name: SPECIFIC_DATE
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+          - dbt_utils.not_empty_string
+
+
+  - name: supplier_dim
+    description: ""
+    columns:
+      - name: S_SUPPKEY
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+          - dbt_utils.not_empty_string
+
