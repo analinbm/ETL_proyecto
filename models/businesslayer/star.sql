@@ -57,7 +57,7 @@ from sales_of_parts
 
 LEFT JOIN {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O
 on O.O_ORDERKEY=sales_of_parts.L_ORDERKEY
-left join {{ source('EDIT_SAMPLE_DATA', 'CUSTOMER') }} C ON C.C_CUSTKEY=O.O_CUSTKEY 
+left join {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C ON C.C_CUSTKEY=O.O_CUSTKEY 
 left join {{ source('EDIT_SAMPLE_DATA', 'PART') }} P ON P.P_PARTKEY=sales_of_parts.PS_PARTKEY
 left join {{ source('EDIT_SAMPLE_DATA', 'SUPPLIER') }} S ON S.S_SUPPKEY=sales_of_parts.PS_SUPPKEY
 
