@@ -1,3 +1,6 @@
+{%docs Transformation_Layer%}
+
+
 --1a taula: taules on hi hagi F
 select O.O_ORDERKEY,O.O_ORDERSTATUS,C.C_NAME,N.N_NAME
 from {{ source('EDIT_SAMPLE_DATA', 'ORDERS') }} O
@@ -167,3 +170,6 @@ group by PS_PARTKEY
 --2400002,188783,3820,1,14.00,26204.92,0.09,0.01,R,F,1994-09-13,1994-09-25,1994-10-06,TAKE BACK RETURN,MAIL," around the slyly ironi"
 {{re_stock_inventory(188783,'1994-09-13')}}
 {{delivery_delays()}}
+
+
+{%enddocs%}
