@@ -9,8 +9,8 @@
 
 
 
-with sales_of_parts as (select PS.PS_PARTKEY, PS.PS_SUPPKEY,L.L_ORDERKEY,L.L_SHIPDATE,L.L_COMMITDATE,L.L_RECEIPTDATE, (L.L_QUANTITY*PS.PS_SUPPLYCOST) AS COGS,L.L_EXTENDEDPRICE as revenue_part,
-L.L_EXTENDEDPRICE*(1-L.L_DISCOUNT)	as	sale_price_part
+with sales_of_parts as (select PS.PS_PARTKEY, PS.PS_SUPPKEY,L.L_ORDERKEY,L.L_SHIPDATE,L.L_COMMITDATE,L.L_RECEIPTDATE,L.L_QUANTITY, (L.L_QUANTITY*PS.PS_SUPPLYCOST) AS COGS,L.L_EXTENDEDPRICE as revenue_part,
+L.L_EXTENDEDPRICE*(1-L.L_DISCOUNT)*(1+ L.L_TAX) as sale_price_for_cust,L.L_EXTENDEDPRICE*(1-L.L_DISCOUNT) as net_revenue
 from {{ source('EDIT_SAMPLE_DATA', 'PARTSUPP') }} PS 
 
 join {{ source('EDIT_SAMPLE_DATA', 'LINEITEM') }} L ON L.L_SUPPKEY=PS.PS_SUPPKEY and L.L_PARTKEY=PS.PS_PARTKEY and L.L_RETURNFLAG<>'R'
@@ -24,10 +24,17 @@ C.C_NATIONKEY, S.S_NATIONKEY,
 
 
 
-O_ORDERDATE,sales_of_parts.L_SHIPDATE,sales_of_parts.L_COMMITDATE,sales_of_parts.L_RECEIPTDATE,coalesce(sum(COGS),0) as COGS_parts,coalesce(sum(revenue_part),0) as REVENUE,coalesce(sum(sale_price_part),0) as net_revenue, coalesce(sum(sale_price_part),0)-coalesce(sum(COGS),0) as GROSS_PROFIT,
-case coalesce(sum(sale_price_part),0)
+O_ORDERDATE,sales_of_parts.L_QUANTITY,sales_of_parts.L_SHIPDATE,sales_of_parts.L_COMMITDATE,sales_of_parts.L_RECEIPTDATE,
+
+
+coalesce(sum(COGS),0) as COGS_parts,coalesce(sum(revenue_part),0) as REVENUE,
+
+coalesce(sum(sales_of_parts.net_revenue),0) as net_revenue, coalesce(sum(sales_of_parts.net_revenue),0)-coalesce(sum(COGS),0) as GROSS_PROFIT,
+
+
+case coalesce(sum(sales_of_parts.net_revenue),0)
     when 0 then 0
-    else round((coalesce(sum(sale_price_part),0)-coalesce(sum(COGS),0))*100/coalesce(sum(sale_price_part),0),2)
+    else round((coalesce(sum(sales_of_parts.net_revenue),0)-coalesce(sum(COGS),0))*100/coalesce(sum(sales_of_parts.net_revenue),0),2)
 end as GROSS_MARGIN_percentage
 from sales_of_parts
 
@@ -37,4 +44,4 @@ left join {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} C ON C.C_CUSTKEY=O.O_CUS
 left join {{ source('EDIT_SAMPLE_DATA', 'PART') }} P ON P.P_PARTKEY=sales_of_parts.PS_PARTKEY
 left join {{ source('EDIT_SAMPLE_DATA', 'SUPPLIER') }} S ON S.S_SUPPKEY=sales_of_parts.PS_SUPPKEY
 
-GROUP BY O.O_ORDERKEY,P.P_PARTKEY,C.C_CUSTKEY,S.S_SUPPKEY,O.O_ORDERDATE,sales_of_parts.L_SHIPDATE,sales_of_parts.L_COMMITDATE,sales_of_parts.L_RECEIPTDATE,C.C_NATIONKEY, S.S_NATIONKEY
+GROUP BY O.O_ORDERKEY,P.P_PARTKEY,C.C_CUSTKEY,S.S_SUPPKEY,O.O_ORDERDATE,sales_of_parts.L_QUANTITY,sales_of_parts.L_SHIPDATE,sales_of_parts.L_COMMITDATE,sales_of_parts.L_RECEIPTDATE,C.C_NATIONKEY, S.S_NATIONKEY
