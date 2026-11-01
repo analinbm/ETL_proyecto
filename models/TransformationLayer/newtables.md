@@ -1,5 +1,5 @@
 {%docs Transformation_Layer%}
-
+{% raw %}   --es tracta com a text nomes
 
 --1a taula: taules on hi hagi F
 select O.O_ORDERKEY,O.O_ORDERSTATUS,C.C_NAME,N.N_NAME
@@ -171,5 +171,5 @@ group by PS_PARTKEY
 {{re_stock_inventory(188783,'1994-09-13')}}
 {{delivery_delays()}}
 
-
+{% endraw %}
 {%enddocs%}
