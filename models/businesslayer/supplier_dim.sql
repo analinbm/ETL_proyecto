@@ -1,0 +1,2 @@
+select S_SUPPKEY,S_NAME,S_NATIONKEY,S_PHONE
+from {{ source('EDIT_SAMPLE_DATA', 'SUPPLIER') }} 

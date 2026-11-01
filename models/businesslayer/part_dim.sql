@@ -1,0 +1,2 @@
+select P_PARTKEY,P_NAME,P_BRAND,P_RETAILPRICE
+from {{ source('EDIT_SAMPLE_DATA', 'PART') }} 

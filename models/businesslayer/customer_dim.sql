@@ -1,0 +1,2 @@
+select C_CUSTKEY,C_NAME,C_NATIONKEY,C_PHONE
+from {{ source('EDIT_SAMPLE_DATA', 'CUSTOMERS') }} 
