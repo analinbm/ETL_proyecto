@@ -1,5 +1,5 @@
 {%docs star_schema%}
-
+{% raw %}   --es tracta com a text nomes
 
 --fact_table
 --order_dim   ----NO FER CAS
@@ -66,7 +66,7 @@ left join {{ source('EDIT_SAMPLE_DATA', 'SUPPLIER') }} S ON S.S_SUPPKEY=sales_of
 
 GROUP BY O.O_ORDERKEY,P.P_PARTKEY,C.C_CUSTKEY,S.S_SUPPKEY,O.O_ORDERDATE,sales_of_parts.L_SHIPDATE,sales_of_parts.L_COMMITDATE,sales_of_parts.L_RECEIPTDATE, P.P_RETAILPRICE
 
-
-
+ --es tracta com a text nomes
+{% endraw %}  
 
 {%enddocs%}
